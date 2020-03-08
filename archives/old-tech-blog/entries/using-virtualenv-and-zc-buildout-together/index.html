@@ -1,0 +1,253 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="shortcut icon" type="image/x-icon" href="/static/favicon.ico">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700" rel="stylesheet"> 
+<link rel="stylesheet" href="/static/gen/style.css">
+<meta property="og:site_name" content="Creative Commons" />
+<meta property="og:title" content="Using virtualenv and zc.buildout together" />
+<meta property="og:description" content="" />
+<meta property="og:url" content="/archives/old-tech-blog/entries/using-virtualenv-and-zc-buildout-together/" />
+<meta property="og:type" content="article" />
+
+      
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Using virtualenv and zc.buildout together">
+<meta name="twitter:description" content="">
+      
+<meta name="twitter:site" content="@creativecommons">
+<meta name="twitter:creator" content="@creativecommons">
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/static/gen/script.js"></script>
+<title>Using virtualenv and zc.buildout together — Creative Commons on GitHub</title>
+<body>
+  <a href="https://github.com/creativecommons/creativecommons.github.io-source" target="_blank" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; left: 0; transform: scale(-1, 1);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg>
+  </a>
+  <div class="ga-script">
+<div id="ga-script"></div>
+<script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-2010376-37', 'auto');
+        ga('send', 'pageview');
+</script>
+</div>
+  <header class="main-header">
+    <div class="container-fluid">
+      <div class="row justify-content-md-center">
+        <div class="col-lg-9 col-md-9 col-sm-12">
+          <nav class="navbar navbar-expand-xl navbar-dark" name="top">
+            
+            <a class="navbar-brand" href="/">
+              <img src="/cclogo.svg">
+              <span class="legend">Creative Commons Open Source</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+        
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="/blog/">Blog</a>
+                </li>
+                <li class="nav-item dropdown ">
+                  <a class="nav-link" href="#" id="navbarContributingCodeDropdown" role="button">Contribute</a>
+                  <div class="dropdown-menu" aria-labelledby="navbarContributingCodeDropdown">
+                    
+                      <a class="dropdown-item" href="/contributing-code/">Contribution Guidelines</a>
+                    
+                      <a class="dropdown-item" href="/contributing-code/projects/">Project List</a>
+                    
+                      <a class="dropdown-item" href="/contributing-code/pr-guidelines/">Pull Request Guidelines</a>
+                    
+                      <a class="dropdown-item" href="/contributing-code/github-repo-guidelines/">GitHub Repo Guidelines</a>
+                    
+                  </div>
+                </li>
+                <li class="nav-item dropdown ">
+                  <a class="nav-link" href="#" id="navbarCommunityDropdown" role="button">Community</a>
+                  <div class="dropdown-menu" aria-labelledby="navbarCommunityDropdown">
+                    
+                      <a class="dropdown-item" href="/community/">Join the Community</a>
+                    
+                      <a class="dropdown-item" href="/community/write-a-blog-post/">Write a Blog Post</a>
+                    
+                      <a class="dropdown-item" href="/community/code-of-conduct/">Code of Conduct</a>
+                    
+                      <a class="dropdown-item" href="/community/code-of-conduct/enforcement/">Code of Conduct Enforcement</a>
+                    
+                  </div>
+                </li>
+                <li class="nav-item dropdown ">
+                  <a class="nav-link" href="#" id="navbarInternshipsDropdown" role="button">Internships</a>
+                  <div class="dropdown-menu" aria-labelledby="navbarInternshipsDropdown">
+                    
+                      <a class="dropdown-item" href="/internships/">Overview</a>
+                    
+                      <a class="dropdown-item" href="/internships/project-ideas/">Project Ideas</a>
+                    
+                      <a class="dropdown-item" href="/internships/applicant-guide/">Applicant Guide</a>
+                    
+                      <a class="dropdown-item" href="/internships/intern-guide/">Intern Guide</a>
+                    
+                      <a class="dropdown-item" href="/internships/mentor-guide/">Mentor Guide</a>
+                    
+                  </div>
+                </li>
+                <li class="nav-item dropdown  active">
+                  <a class="nav-link" href="#" id="navbarArchivesDropdown" role="button">Archives</a>
+                  <div class="dropdown-menu" aria-labelledby="navbarArchivesDropdown">
+                    
+                      <a class="dropdown-item" href="/archives/old-tech-blog">CC Tech Blog (2007-2014)</a>
+                    
+                      <a class="dropdown-item" href="https://lists.ibiblio.org/pipermail/cc-devel/">cc-devel mailing list (2005-2015)</a>
+                    
+                  </div>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="https://creativecommons.org" target="_blank">creativecommons.org</a>
+                </li>
+              </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="container-fluid page-content">
+    <div class="row justify-content-md-center">
+      <div class="col-lg-9 col-md-9 col-sm-12 content-wrap">
+        <div class="page py-3">
+          <h1 class="page-title pb-3 mb-4">Archive: CC Technical Blog (2007-2014)</h1>
+          
+  <h2 class="mb-0">Using virtualenv and zc.buildout together</h2>
+  
+  <p class="meta text-muted mt-0 mb-2">by <a href="/archives/old-tech-blog/authors/cwebber/">
+  cwebber
+</a>
+  on Tuesday, 2010-03-16</p>
+  
+  <div class="body"><p><a href="http://pypi.python.org/pypi/virtualenv">Virtualenv</a> and <a href="http://www.buildout.org/">zc.buildout</a> are both great ways to develop python packages and deploy collections of packages without needing to touch the system library. They are both fairly similar, but also fairly different.</p>
+<p>The primary difference between them is that zc.buildout focuses on having a single package, and all relevant dependencies are installed automatically within that package's directory via the buildout script (Nathan Yergler points out that you don't have to use things this way, but that seems to me to be the way things happen in practice... anyway, I'm not a buildout expert). The buildout script is very automagical and does all the configuration and installation of dependencies for you. Since this is a build system, you can also configure it to do a number of other neat things, such as compile all your gettext catalogs, or scp the latest cheesefile.txt from themoon.example.org... whatever you need to do to build a package.</p>
+<p>Virtualenv is mostly the same creature, but it's like you reached your hand inside and pulled it inside out. Instead of a bunch of packages installed within a subdirectory of one package, there is a more generic directory layout that allows you to set up a number of packages within it. Installing a package and keeping it up to date is much more manual in general, but also a bit more flexible in the sense that you can switch paths around within the environment fairly easily and simultaneously developing multiple interwoven packages is not difficult.</p>
+<p>I came to CC with a lot of experience with virtualenv and no experience with zc.buildout. Initially I could discern no differences of use case between them, but now I have a pretty good sense of when you'd want to use one over the other. An example use case, which has come up pretty often with me actually: say you have two packages, one of which is a dependency on the other. In this case, we'll use both cc.license and cc.engine, where cc.engine has cc.license as a<br>
+dependency.</p>
+<p>Now say I'm adding a feature to cc.engine, but this feature also requires that I add something in cc.license. At this point it is<br>
+easier for me to switch to using virtualenv; I can set up both development packages in the same virtualenv and use them together. This is great because it means that I should have little to no difficulty switching back and forth between both of them. If I make a change in cc.license it is immediately available to me in cc.engine. This also prevents either having to set up a tedious to switch around configuration checking out cc.license into cc.engine and etc, or making a bunch of unnecessary releases just to make sure things work, etc. It's easier to work on multiple packages at once in<br>
+virtualenv in my experience.</p>
+<p>Now let's assume that we got things in working order, cc.license has the new feature and cc.engine is able to use it properly, tests are passing, and et cetera. At this point is where I think returning to zc.buildout is a good idea. One of the things I like about zc.buildout is that it provides a certain type of integrity checking with the buildout command. If you forget to mark a dependency or even remove it from setup.py on accident or whatever, buildout will simply unlink it from your path the next time you run it. In this case, I think zc.buildout is especially useful because I might forget to make a cc.license release here or some such thing. There are some other reasons for using zc.buildout (as the name implies, buildout is a full build system, so there are a lot of neat things you can do with it), but for a forgetful person such as myself this is by far the most important to me (and the most relevant to this example).</p>
+<p>So I've described use cases for both cc.engine and cc.license. How do we get them to work nicely together? Let's assume we just want to check out these packages once. Let's also assume that our virtualenv directory is ~/env/ccommons (because I'm clearly basing this off my own current setup currently, heh).</p>
+<p>First, we'll create our virtualenv environment, if we haven't already:</p>
+<blockquote><pre><code>$ virtualenv ~/env/ccommons
+</code></pre>
+<p></p>
+</blockquote>
+<p>Next, we'll check out cc.engine and cc.license into ~/devel/ and run<br>
+buildout on each:</p>
+<blockquote><pre><code>$ cd ~/devel/
+$ git clone git://code.creativecommons.org/cc.license.git
+$ git clone git://code.creativecommons.org/cc.engine.git
+</code></pre>
+<p></p>
+</blockquote>
+<p>Next, we'll buildout the packages:</p>
+<blockquote><pre><code>$ cd ~/devel/cc.license
+$ wget http://svn.zope.org/*checkout*/zc.buildout/trunk/bootstrap/bootstrap.py
+$ python bootstrap.py
+$ ./bin/buildout
+$ cd ~/devel/cc.engine
+$ python bootstrap.py # the cc engine already has bootstrap.py checked in
+$ ./bin/buildout
+</code></pre>
+<p></p>
+</blockquote>
+<p>Buildout can take a while, so be prepared to go grab some cookies and coffee and/or tea. But once it's done, getting these packages set up in virtualenv is super simple.</p>
+<p>First activate the virtualenv environment:</p>
+<blockquote><pre><code>$ source ~/env/ccommons/bin/activate
+$ cd ~/devel/cc.license
+$ python setup.py develop
+$ cd ~/devel/cc.engine
+$ python setup.py develop
+</code></pre>
+<p></p>
+</blockquote>
+<p>That's it! Now we can verify that these packages are set up in virtualenv. Open python and verify that you get the following output (adjusted to your own home directory and etc):</p>
+<blockquote><pre><code>&gt;&gt;&gt; import cc.engine
+&gt;&gt;&gt; cc.engine.__file__
+'/home/cwebber/devel/cc.engine/cc/engine/__init__.pyc'
+&gt;&gt;&gt; import cc.license
+&gt;&gt;&gt; cc.license.__file__
+'/home/cwebber/devel/cc.license-git/cc/license/__init__.pyc'
+</code></pre>
+<p></p>
+</blockquote>
+<p>To leave virtualenv, you can simply type "deactivate".</p>
+<p>That's it! Now you have a fully functional zc.buildout AND virtualenv setup, where switching back and forth is super simple.</p>
+</div>
+  
+  <div class="card bg-light">
+    <div class="card-body p-2">
+      <p class="meta my-0"><span class="mr-2"><strong>Categories:</strong></span>
+        
+          
+            
+            
+            <a href=" /archives/old-tech-blog/categories/development/ ">development</a>,
+          
+            
+            
+            <a href=" /archives/old-tech-blog/categories/python/ ">python</a>,
+          
+            
+            
+            <a href=" /archives/old-tech-blog/categories/techblog/ ">techblog</a>
+          
+        
+      </p>
+    </div>
+  </div>
+
+  <div class="comments">
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function() { this.page.identifier = "/archives/old-tech-blog/entries/using-virtualenv-and-zc-buildout-together"; this.page.url = "http://opensource.creativecommons.org/archives/old-tech-blog/entries/using-virtualenv-and-zc-buildout-together/"; };
+  (function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//cc-open-source.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>
+  Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript"
+    rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+</div>
+
+          <a id="back-to-top" href="#top" class="btn btn-dark btn-sm" role="button">Back to top</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="main-footer bg-dark">
+    <div class="container-fluid">
+      <div class="row justify-content-md-center">
+        <div class="col-lg-9 col-md-9 col-sm-12 footer text-light py-4 px-3">
+          <small>
+            <p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License"
+                  style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a></p>
+            <p class="text-muted">All the content on this website is licensed under a <strong><a rel="license"
+                  href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International
+                  License</a></strong> unless otherwise specified.</p>
+          </small>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
